@@ -2,6 +2,8 @@ import plotly.express as px
 from skyline_solver import SkylineSolver
 import pandas as pd
 import glob
+import math
+import numpy as np
 import timeit
 
 pd.set_option("display.max_columns", None)
@@ -53,32 +55,32 @@ class Profiler:
 
         fig = px.scatter(
             self.df,
-            x="Taille",
-            y=["Naif", "DPR", "DPRS"],
-            log_x=True,
-            log_y=True,
+            x="Naif_2",
+            y="Naif",
+            # log_x=True,
+            # log_y=True,
             trendline="ols",
-            trendline_options=dict(log_x=True, log_y=True),
+            # trendline_options=dict(log_x=True, log_y=True),
         )
 
         model = px.get_trendline_results(fig)
         alpha = model.iloc[0]["px_fit_results"].params[0]
         beta = model.iloc[0]["px_fit_results"].params[1]
 
-        fig.data[1].name = ' y = ' + str(round(alpha, 2)) + ' + ' + str(round(beta, 2)) + 'x'
+        fig.data[1].name = ' y = ' + str(alpha) + ' + ' + str(round(beta, 2)) + 'x'
         fig.data[1].showlegend = True
 
-        alpha = model.iloc[1]["px_fit_results"].params[0]
-        beta = model.iloc[1]["px_fit_results"].params[1]
+        # alpha = model.iloc[1]["px_fit_results"].params[0]
+        # beta = model.iloc[1]["px_fit_results"].params[1]
 
-        fig.data[3].name = ' y = ' + str(round(alpha, 2)) + ' + ' + str(round(beta, 2)) + 'x'
-        fig.data[3].showlegend = True
+        # fig.data[3].name = ' y = ' + str(round(alpha, 2)) + ' + ' + str(round(beta, 2)) + 'x'
+        # fig.data[3].showlegend = True
 
-        alpha = model.iloc[2]["px_fit_results"].params[0]
-        beta = model.iloc[2]["px_fit_results"].params[1]
+        # alpha = model.iloc[2]["px_fit_results"].params[0]
+        # beta = model.iloc[2]["px_fit_results"].params[1]
 
-        fig.data[5].name = ' y = ' + str(round(alpha, 2)) + ' + ' + str(round(beta, 2)) + 'x'
-        fig.data[5].showlegend = True
+        # fig.data[5].name = ' y = ' + str(round(alpha, 2)) + ' + ' + str(round(beta, 2)) + 'x'
+        # fig.data[5].showlegend = True
         fig.show()
 
 
@@ -106,4 +108,8 @@ def plot_times(profiler, df=None):
 
 profiler = Profiler()
 # compute_average_times(profiler)
-plot_times(profiler, pd.read_csv('results.csv'))
+df = pd.read_csv('results.csv')
+df['Naif_2'] = df['Taille'] ** 2
+df['DPR_2'] = df['Taille'] * np.log(df.Taille)
+df['DPRS_2'] = df['Taille'] * np.log(df.Taille)
+plot_times(profiler, df)
